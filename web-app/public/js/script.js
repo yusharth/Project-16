@@ -10,6 +10,7 @@ const byod = document.getElementById('byod');
 const byodText = document.getElementById('byodText');
 const defaultScenario = document.getElementById('defaultScenario');
 const runScenarioBtn = document.getElementById('runScenario');
+const runScenarioBtn2 = document.getElementById('runScenario2');
 let defaultFlag = false;
 
 doOutputText.hidden = true;
@@ -25,6 +26,26 @@ async function createDefaultJob() {
   outputText.hidden = false;
 
   var res = await fetch('http://localhost:8080/sendDefault', {
+    method: 'POST',
+    body: '',
+  });
+  var body = await res.text();
+  let jsonBody = JSON.parse(body);
+
+  //parse the output from Watson Machine Learning to grab the created at time
+  let createdAt = jsonBody.metadata.created_at;
+  firstSpinner.hidden = true;
+
+  //set the HTML for the job creation time
+  output.innerHTML += '<p id = "jobText" >Job created at: </p>' + '<span>' + createdAt + '</span>';
+  solutionUpdate.hidden = false;
+}
+//create default job, uses default input data
+async function createIntermediateJob() {
+  firstSpinner.hidden = false;
+  outputText.hidden = false;
+
+  var res = await fetch('http://localhost:8080/sendIntermediate', {
     method: 'POST',
     body: '',
   });
@@ -239,9 +260,20 @@ byod.addEventListener('click', async (e) => {
 //click on the run default scenario button
 runScenarioBtn.addEventListener('click', async (e) => {
   runScenarioBtn.hidden = true;
+  runScenarioBtn2.hidden = true;  
   defaultScenario.hidden = true;
   byod.hidden = true;
   byodText.hidden = true;
   defaultFlag = true;
   await createDefaultJob();
+});
+//click on the run Intermediate scenario button
+runScenarioBtn2.addEventListener('click', async (e) => {
+  runScenarioBtn.hidden = true;
+  runScenarioBtn2.hidden = true;
+  defaultScenario.hidden = true;
+  byod.hidden = true;
+  byodText.hidden = true;
+  defaultFlag = true;
+  await createIntermediateJob();
 });

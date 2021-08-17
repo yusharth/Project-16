@@ -6,6 +6,7 @@ const axios = require('axios');
 const bodyParser = require('body-parser');
 const fileupload = require('express-fileupload');
 const defaultData = require('./data.js');
+const IntermediateData = require('./data2.js');
 require('dotenv').config();
 const cors = require('cors');
 app.use(cors());
@@ -98,6 +99,24 @@ app.post('/sendDefault', async function (req, res) {
   console.log('SEND DEFAULT DATA');
 
   const response = await axios.post(postURL, defaultData.data, {
+    headers: {
+      Authorization: process.env.TOKEN,
+      'Content-Type': 'application/json',
+    },
+  });
+  res.send(JSON.stringify(response.data));
+});
+app.post('/sendIntermediate', async function (req, res) {
+  // add tag before we create a new job to solve a Decision optimization problem
+  latestTag = Math.random()
+    .toString(36)
+    .replace(/[^a-z]+/g, '')
+    .substr(0, 5);
+    IntermediateData.data.tags = [latestTag];
+
+  console.log('SEND INTERMEDIATE DATA');
+
+  const response = await axios.post(postURL, IntermediateData.data, {
     headers: {
       Authorization: process.env.TOKEN,
       'Content-Type': 'application/json',
